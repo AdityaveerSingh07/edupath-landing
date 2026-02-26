@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduPath — Find Your Perfect College</title>
+
+  <!-- ============================================================
+       GOOGLE ANALYTICS 4 (GA4) — REPLACE G-XXXXXXXXXX WITH YOUR
+       ACTUAL MEASUREMENT ID FROM analytics.google.com
+  ============================================================ -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    // ── GA4 Config ──────────────────────────────────────────────
+    gtag('config', 'G-XXXXXXXXXX', {
+      page_title: 'EduPath Landing Page',
+      page_location: window.location.href,
+      send_page_view: true          // auto page_view event
+    });
+
+    // ── HELPER: Fire a GA4 Event ─────────────────────────────────
+    function trackEvent(eventName, params) {
+      gtag('event', eventName, params);
+      console.log('[GA EVENT]', eventName, params);   // debug log
+    }
+
+    // ── GOAL 1: CTA Button Click (Conversion) ───────────────────
+    function trackCTAClick(label) {
+      trackEvent('cta_click', {
+        event_category: 'engagement',
+        event_label: label,
+        value: 1
+      });
+      // Mark as a GA4 Conversion (configure in GA4 > Events > Mark as conversion)
+    }
+
+    // ── GOAL 2: Form Submission (Lead Generation) ───────────────
+    function trackFormSubmit(college) {
+      trackEvent('lead_form_submit', {
+        event_category: 'conversion',
+        event_label: college,
+        value: 5
+      });
+    }
+
+    // ── GOAL 3: Scroll Depth ─────────────────────────────────────
+    let scrollMilestones = { 25: false, 50: false, 75: false, 100: false };
+    window.addEventListener('scroll', () => {
+      let scrolled = Math.round(
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+      );
+      for (let pct in scrollMilestones) {
+        if (!scrollMilestones[pct] && scrolled >= pct) {
+          scrollMilestones[pct] = true;
+          trackEvent('scroll_depth', {
+            event_category: 'engagement',
+            event_label: pct + '%',
+            non_interaction: pct < 50
+          });
+        }
+      }
+    });
+
+    // ── GOAL 4: Time on Page (30s engagement) ───────────────────
+    setTimeout(() => {
+      trackEvent('engaged_visit', {
+        event_category: 'engagement',
+        event_label: '30s_on_page',
+        value: 2
+      });
+    }, 30000);
+
+    // ── GOAL 5: College Card Click ───────────────────────────────
+    function trackCollegeClick(collegeName) {
+      trackEvent('college_card_click', {
+        event_category: 'interest',
+        event_label: collegeName,
+        value: 3
+      });
+    }
+
+    // ── GOAL 6: Video / Demo Play ────────────────────────────────
+    function trackVideoPlay() {
+      trackEvent('video_play', {
+        event_category: 'engagement',
+        event_label: 'demo_video',
+        value: 1
+      });
+    }
+
+    // ── GOAL 7: Exit Intent ──────────────────────────────────────
+    document.addEventListener('mouseleave', (e) => {
+      if (e.clientY <= 0) {
+        trackEvent('exit_intent', {
+          event_category: 'engagement',
+          event_label: 'user_about_to_leave'
+        });
+      }
+    });
+
+    // ── GOAL 8: Phone / Email Click (Micro-conversion) ──────────
+    function trackContactClick(type) {
+      trackEvent('contact_click', {
+        event_category: 'micro_conversion',
+        event_label: type
+      });
+    }
+  </script>
+
+  <!-- ============================================================
+       GOOGLE TAG MANAGER (Optional — alternative approach)
+       Uncomment and replace GTM-XXXXXXX with your container ID
+  ============================================================ -->
+  <!--
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink:    #0f0e0a;
+      --cream:  #f7f3ec;
+      --gold:   #c9a84c;
+      --rust:   #b84a2e;
+      --sage:   #4a7c59;
+      --sand:   #e8dfc8;
+      --muted:  #7a7260;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ───────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 3rem;
+      background: rgba(247,243,236,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--sand);
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 900;
+      color: var(--ink); letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--gold); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--muted);
+      font-size: 0.9rem; font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta {
+      background: var(--ink); color: var(--cream);
+      padding: .65rem 1.4rem; border-radius: 2px;
+      text-decoration: none; font-size: .85rem; font-weight: 500;
+      transition: background .2s;
+      cursor: pointer; border: none;
+    }
+    .nav-cta:hover { background: var(--rust); }
+
+    /* ── HERO ──────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; right: -120px; top: -120px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--sand); color: var(--muted);
+      font-size: .75rem; letter-spacing: .12em; text-transform: uppercase;
+      padding: .4rem 1rem; border-radius: 2px; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 em {
+      font-style: italic; color: var(--rust);
+    }
+    .hero p {
+      font-size: 1.1rem; color: var(--muted);
+      line-height: 1.7; max-width: 440px;
+      margin-bottom: 2.5rem;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--ink); color: var(--cream);
+      padding: 1rem 2rem; border-radius: 2px;
+      font-size: .95rem; font-weight: 500;
+      border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-primary:hover { background: var(--rust); transform: translateY(-2px); }
+    .btn-secondary {
+      background: transparent; color: var(--ink);
+      padding: 1rem 2rem; border-radius: 2px;
+      font-size: .95rem; font-weight: 500;
+      border: 2px solid var(--ink); cursor: pointer;
+      transition: all .2s; text-decoration: none; display: inline-block;
+    }
+    .btn-secondary:hover { background: var(--ink); color: var(--cream); }
+
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+      position: relative;
+    }
+    .stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem; max-width: 400px;
+    }
+    .stat-card {
+      background: white; padding: 1.8rem 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+      border-left: 3px solid var(--gold);
+    }
+    .stat-card:nth-child(2) { border-left-color: var(--rust); margin-top: 1.5rem; }
+    .stat-card:nth-child(3) { border-left-color: var(--sage); }
+    .stat-card:nth-child(4) { border-left-color: var(--ink); margin-top: -1.5rem; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 700; color: var(--ink);
+    }
+    .stat-label { font-size: .8rem; color: var(--muted); margin-top: .3rem; }
+
+    /* ── TRUST BAR ─────────────────────────────────────────────── */
+    .trust-bar {
+      background: var(--ink); color: var(--cream);
+      padding: 1.2rem 3rem;
+      display: flex; justify-content: center; gap: 3rem;
+      flex-wrap: wrap; align-items: center;
+    }
+    .trust-item { font-size: .85rem; opacity: .7; letter-spacing: .05em; }
+    .trust-item span { opacity: 1; font-weight: 600; color: var(--gold); }
+
+    /* ── FEATURES ──────────────────────────────────────────────── */
+    .section { padding: 6rem 3rem; }
+    .section-header { text-align: center; margin-bottom: 4rem; }
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 700; margin-bottom: 1rem;
+    }
+    .section-header p { color: var(--muted); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2rem; max-width: 1100px; margin: 0 auto;
+    }
+    .feature-card {
+      padding: 2.5rem 2rem;
+      border: 1px solid var(--sand);
+      border-radius: 4px;
+      transition: transform .2s, box-shadow .2s;
+      background: white;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+    .feature-icon { font-size: 2.4rem; margin-bottom: 1.2rem; }
+    .feature-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: .8rem; }
+    .feature-card p { color: var(--muted); font-size: .95rem; line-height: 1.7; }
+
+    /* ── COLLEGES ──────────────────────────────────────────────── */
+    .colleges-section { background: var(--sand); }
+    .colleges-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+    }
+    .college-card {
+      background: white; border-radius: 4px; overflow: hidden;
+      cursor: pointer; transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .college-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    .college-banner {
+      height: 140px;
+      display: flex; align-items: flex-end;
+      padding: 1rem;
+    }
+    .college-banner.iit  { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+    .college-banner.bits { background: linear-gradient(135deg, #4a1942 0%, #6b2d5e 100%); }
+    .college-banner.aiims{ background: linear-gradient(135deg, #1a3a1a 0%, #2d5a2d 100%); }
+    .college-banner.iim  { background: linear-gradient(135deg, #2a1500 0%, #5a3000 100%); }
+    .college-banner.nit  { background: linear-gradient(135deg, #001a3a 0%, #003080 100%); }
+    .college-banner.du   { background: linear-gradient(135deg, #1a0000 0%, #5a0000 100%); }
+    .college-banner-tag {
+      background: rgba(255,255,255,0.15);
+      color: white; font-size: .7rem;
+      padding: .25rem .6rem; border-radius: 2px;
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    .college-info { padding: 1.5rem; }
+    .college-info h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: .5rem; }
+    .college-meta { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .college-meta span { font-size: .78rem; color: var(--muted); }
+    .college-rating { color: var(--gold); font-weight: 600; }
+    .college-cta-row { padding: 0 1.5rem 1.5rem; }
+    .btn-outline-sm {
+      font-size: .8rem; padding: .5rem 1rem;
+      border: 1.5px solid var(--ink); border-radius: 2px;
+      background: none; cursor: pointer; font-weight: 500;
+      transition: all .2s;
+    }
+    .btn-outline-sm:hover { background: var(--ink); color: white; }
+
+    /* ── LEAD FORM ─────────────────────────────────────────────── */
+    .form-section { background: var(--ink); color: var(--cream); }
+    .form-container {
+      max-width: 700px; margin: 0 auto; text-align: center;
+    }
+    .form-container h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3vw, 2.8rem);
+      margin-bottom: 1rem;
+    }
+    .form-container p { color: rgba(247,243,236,.6); margin-bottom: 2.5rem; line-height: 1.7; }
+    .lead-form {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem; text-align: left;
+    }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label {
+      font-size: .8rem; letter-spacing: .07em; text-transform: uppercase;
+      color: rgba(247,243,236,.5); margin-bottom: .5rem;
+    }
+    .form-group input, .form-group select {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.15);
+      color: var(--cream); padding: .85rem 1rem;
+      border-radius: 2px; font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      transition: border-color .2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--gold);
+    }
+    .form-group select option { background: var(--ink); }
+    .submit-btn {
+      grid-column: 1 / -1;
+      background: var(--gold); color: var(--ink);
+      padding: 1.1rem; border: none; border-radius: 2px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: filter .2s, transform .15s;
+    }
+    .submit-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+    /* ── TESTIMONIALS ──────────────────────────────────────────── */
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2rem; max-width: 1100px; margin: 0 auto;
+    }
+    .testimonial {
+      background: white; padding: 2rem;
+      border-radius: 4px; border-top: 3px solid var(--gold);
+    }
+    .testimonial p { color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 1rem; }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: white; font-size: .9rem;
+    }
+    .author-info .name { font-weight: 600; font-size: .9rem; }
+    .author-info .college { font-size: .78rem; color: var(--muted); }
+
+    /* ── FAQ ───────────────────────────────────────────────────── */
+    .faq-section { background: var(--sand); }
+    .faq-list { max-width: 750px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid rgba(0,0,0,.1); }
+    .faq-q {
+      width: 100%; background: none; border: none;
+      text-align: left; padding: 1.5rem 0;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      font-weight: 500; cursor: pointer; color: var(--ink);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-q::after { content: '+'; font-size: 1.4rem; color: var(--gold); }
+    .faq-q.open::after { content: '−'; }
+    .faq-a { display: none; padding-bottom: 1.5rem; color: var(--muted); line-height: 1.7; font-size: .95rem; }
+    .faq-a.open { display: block; }
+
+    /* ── FOOTER ────────────────────────────────────────────────── */
+    footer {
+      background: var(--ink); color: var(--cream);
+      padding: 3rem 3rem 2rem;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2.5rem; margin-bottom: 2.5rem;
+    }
+    footer h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; margin-bottom: 1.2rem; color: var(--gold);
+    }
+    footer p, footer a {
+      font-size: .85rem; color: rgba(247,243,236,.5);
+      text-decoration: none; line-height: 2;
+      display: block; transition: color .2s;
+    }
+    footer a:hover { color: var(--cream); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 1.5rem;
+      display: flex; justify-content: space-between;
+      font-size: .8rem; color: rgba(247,243,236,.3);
+    }
+
+    /* ── TOAST ─────────────────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--sage); color: white;
+      padding: 1rem 1.5rem; border-radius: 4px;
+      font-size: .9rem; font-weight: 500;
+      opacity: 0; transform: translateY(10px);
+      transition: all .4s; pointer-events: none; z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 3rem; }
+      .hero-visual { display: none; }
+      .features-grid, .colleges-grid, .testimonials-grid { grid-template-columns: 1fr; }
+      .lead-form { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+    }
+
+    /* ── ENTRANCE ANIMATIONS ───────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-content > * {
+      opacity: 0;
+      animation: fadeUp .7s ease forwards;
+    }
+    .hero-content > *:nth-child(1) { animation-delay: .1s; }
+    .hero-content > *:nth-child(2) { animation-delay: .25s; }
+    .hero-content > *:nth-child(3) { animation-delay: .4s; }
+    .hero-content > *:nth-child(4) { animation-delay: .55s; }
+    .stat-card {
+      opacity: 0;
+      animation: fadeUp .7s ease forwards;
+    }
+    .stat-card:nth-child(1) { animation-delay: .5s; }
+    .stat-card:nth-child(2) { animation-delay: .65s; }
+    .stat-card:nth-child(3) { animation-delay: .8s; }
+    .stat-card:nth-child(4) { animation-delay: .95s; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Edu<span>Path</span></div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#colleges">Colleges</a></li>
+      <li><a href="#testimonials">Stories</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <button class="nav-cta" onclick="trackCTAClick('nav_apply_now'); document.getElementById('apply').scrollIntoView({behavior:'smooth'})">
+      Apply Now
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">India's #1 College Discovery Platform</div>
+      <h1>Find Your <em>Perfect</em><br>College Match</h1>
+      <p>Personalised college recommendations, admission guidance, and scholarship tools — all in one place. Over 8 lakh students found their dream college with EduPath.</p>
+      <div class="hero-actions">
+        <button class="btn-primary"
+          onclick="trackCTAClick('hero_explore'); document.getElementById('colleges').scrollIntoView({behavior:'smooth'})">
+          Explore Colleges
+        </button>
+        <button class="btn-secondary"
+          onclick="trackCTAClick('hero_free_counselling'); document.getElementById('apply').scrollIntoView({behavior:'smooth'})">
+          Free Counselling
+        </button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">6,200+</div>
+          <div class="stat-label">Colleges Listed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">8L+</div>
+          <div class="stat-label">Students Placed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">₹40Cr</div>
+          <div class="stat-label">Scholarships Won</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">98%</div>
+          <div class="stat-label">Satisfaction Rate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="trust-item">As seen in <span>Times of India</span></div>
+    <div class="trust-item">Partnered with <span>UGC & AICTE</span></div>
+    <div class="trust-item">Trusted by <span>500+ Institutions</span></div>
+    <div class="trust-item">Winner <span>EdTech India 2024</span></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="section-header">
+      <h2>Everything You Need to Decide</h2>
+      <p>From rankings to placements, we help you choose with confidence — not just guesswork.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card" onclick="trackEvent('feature_click',{event_label:'smart_match'})">
+        <div class="feature-icon">🎯</div>
+        <h3>Smart College Match</h3>
+        <p>Our AI analyses your scores, preferences, and career goals to surface the colleges where you are most likely to succeed.</p>
+      </div>
+      <div class="feature-card" onclick="trackEvent('feature_click',{event_label:'rank_predictor'})">
+        <div class="feature-icon">📊</div>
+        <h3>Rank & Cut-off Predictor</h3>
+        <p>Real-time JEE, NEET, CAT cut-off data with predictive modelling — know your chances before you apply.</p>
+      </div>
+      <div class="feature-card" onclick="trackEvent('feature_click',{event_label:'scholarships'})">
+        <div class="feature-icon">🏅</div>
+        <h3>Scholarship Finder</h3>
+        <p>Filter 12,000+ scholarships by category, income slab, and college — apply directly from your dashboard.</p>
+      </div>
+      <div class="feature-card" onclick="trackEvent('feature_click',{event_label:'placement_reports'})">
+        <div class="feature-icon">💼</div>
+        <h3>Placement Reports</h3>
+        <p>Verified placement data from colleges — median CTC, top recruiters, and sector-wise hiring trends.</p>
+      </div>
+      <div class="feature-card" onclick="trackEvent('feature_click',{event_label:'expert_counselling'})">
+        <div class="feature-icon">👩‍🏫</div>
+        <h3>Expert Counselling</h3>
+        <p>1-on-1 video sessions with IIT/IIM alumni counsellors who have guided thousands of successful admissions.</p>
+      </div>
+      <div class="feature-card" onclick="trackEvent('feature_click',{event_label:'virtual_tours'})">
+        <div class="feature-icon">🏛️</div>
+        <h3>Virtual Campus Tours</h3>
+        <p>360° campus walkthroughs, hostel reviews, and student vlogs — visit before you visit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLLEGES -->
+  <section class="section colleges-section" id="colleges">
+    <div class="section-header">
+      <h2>Top Colleges, Curated For You</h2>
+      <p>Explore India's finest institutions with verified rankings and real student insights.</p>
+    </div>
+    <div class="colleges-grid">
+
+      <div class="college-card" onclick="trackCollegeClick('IIT Bombay')">
+        <div class="college-banner iit"><span class="college-banner-tag">Engineering</span></div>
+        <div class="college-info">
+          <h4>IIT Bombay</h4>
+          <div class="college-meta">
+            <span class="college-rating">★ 4.9</span>
+            <span>Powai, Mumbai</span>
+            <span>NIRF #3</span>
+          </div>
+        </div>
+        <div class="college-cta-row">
+          <button class="btn-outline-sm" onclick="event.stopPropagation(); trackCTAClick('know_more_IIT_Bombay')">Know More →</button>
+        </div>
+      </div>
+
+      <div class="college-card" onclick="trackCollegeClick('BITS Pilani')">
+        <div class="college-banner bits"><span class="college-banner-tag">Engineering</span></div>
+        <div class="college-info">
+          <h4>BITS Pilani</h4>
+          <div class="college-meta">
+            <span class="college-rating">★ 4.8</span>
+            <span>Pilani, Rajasthan</span>
+            <span>NIRF #26</span>
+          </div>
+        </div>
+        <div class="college-cta-row">
+          <button class="btn-outline-sm" onclick="event.stopPropagation(); trackCTAClick('know_more_BITS_Pilani')">Know More →</button>
+        </div>
+      </div>
+
+      <div class="college-card" onclick="trackCollegeClick('AIIMS Delhi')">
+        <div class="college-banner aiims"><span class="college-banner-tag">Medical</span></div>
+        <div class="college-info">
+          <h4>AIIMS New Delhi</h4>
+          <div class="college-meta">
+            <span class="college-rating">★ 5.0</span>
+            <span>New Delhi</span>
+            <span>NIRF #1 Medical</span>
+          </div>
+        </div>
+        <div class="college-cta-row">
+          <button class="btn-outline-sm" onclick="event.stopPropagation(); trackCTAClick('know_more_AIIMS')">Know More →</button>
+        </div>
+      </div>
+
+      <div class="college-card" onclick="trackCollegeClick('IIM Ahmedabad')">
+        <div class="college-banner iim"><span class="college-banner-tag">Management</span></div>
+        <div class="college-info">
+          <h4>IIM Ahmedabad</h4>
+          <div class="college-meta">
+            <span class="college-rating">★ 4.9</span>
+            <span>Ahmedabad, Gujarat</span>
+            <span>NIRF #1 MBA</span>
+          </div>
+        </div>
+        <div class="college-cta-row">
+          <button class="btn-outline-sm" onclick="event.stopPropagation(); trackCTAClick('know_more_IIMA')">Know More →</button>
+        </div>
+      </div>
+
+      <div class="college-card" onclick="trackCollegeClick('NIT Trichy')">
+        <div class="college-banner nit"><span class="college-banner-tag">Engineering</span></div>
+        <div class="college-info">
+          <h4>NIT Trichy</h4>
+          <div class="college-meta">
+            <span class="college-rating">★ 4.7</span>
+            <span>Tiruchirappalli, TN</span>
+            <span>NIRF #8 NIT</span>
+          </div>
+        </div>
+        <div class="college-cta-row">
+          <button class="btn-outline-sm" onclick="event.stopPropagation(); trackCTAClick('know_more_NIT_Trichy')">Know More →</button>
+        </div>
+      </div>
+
+      <div class="college-card" onclick="trackCollegeClick('Delhi University')">
+        <div class="college-banner du"><span class="college-banner-tag">Liberal Arts</span></div>
+        <div class="college-info">
+          <h4>University of Delhi</h4>
+          <div class="college-meta">
+            <span class="college-rating">★ 4.6</span>
+            <span>New Delhi</span>
+            <span>NIRF #11</span>
+          </div>
+        </div>
+        <div class="college-cta-row">
+          <button class="btn-outline-sm" onclick="event.stopPropagation(); trackCTAClick('know_more_DU')">Know More →</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LEAD FORM -->
+  <section class="section form-section" id="apply">
+    <div class="form-container">
+      <h2>Get Free College Counselling</h2>
+      <p>Fill in your details and one of our expert counsellors will reach out within 24 hours — absolutely free.</p>
+      <form class="lead-form" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="fname" placeholder="Riya Sharma" required />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="phone" placeholder="+91 98765 43210" required />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="riya@email.com" required />
+        </div>
+        <div class="form-group">
+          <label>Exam Appeared</label>
+          <select id="exam">
+            <option value="">Select Exam</option>
+            <option>JEE Main / Advanced</option>
+            <option>NEET</option>
+            <option>CAT / MAT</option>
+            <option>CUET</option>
+            <option>State CET</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Preferred College / Stream</label>
+          <input type="text" id="preference" placeholder="e.g. IIT — Computer Science" />
+        </div>
+        <button type="submit" class="submit-btn">Request Free Counselling →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section" id="testimonials">
+    <div class="section-header">
+      <h2>Students Who Found Their Path</h2>
+      <p>Real stories from real students — unfiltered and unsponsored.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <p>"EduPath showed me that I was eligible for NIT Warangal when every coaching centre had written me off. The cut-off predictor was spot-on. I'm now in CSE and couldn't be happier."</p>
+        <div class="testimonial-author">
+          <div class="avatar" style="background:var(--rust)">AR</div>
+          <div class="author-info">
+            <div class="name">Arjun Rawat</div>
+            <div class="college">NIT Warangal, CSE '24</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p>"The scholarship finder alone saved my family ₹3.5 lakhs. The counsellor helped me draft a personal statement that got me into Manipal's medicine programme on merit."</p>
+        <div class="testimonial-author">
+          <div class="avatar" style="background:var(--sage)">PS</div>
+          <div class="author-info">
+            <div class="name">Priya Singh</div>
+            <div class="college">Manipal, MBBS '25</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p>"I was confused between 14 colleges. After the EduPath assessment, I had a ranked shortlist of 5 with reasoning I could actually explain to my parents. Best decision I made."</p>
+        <div class="testimonial-author">
+          <div class="avatar" style="background:var(--gold)">KM</div>
+          <div class="author-info">
+            <div class="name">Kabir Mehta</div>
+            <div class="college">XLRI Jamshedpur, MBA '24</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section faq-section" id="faq">
+    <div class="section-header">
+      <h2>Frequently Asked Questions</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this, 'Is EduPath free to use?')">Is EduPath completely free?</button>
+        <div class="faq-a">Yes! College search, rankings, cut-off data, and basic counselling are completely free. Premium plans unlock detailed placement analytics and unlimited 1-on-1 sessions.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this, 'How accurate is the predictor?')">How accurate is the rank predictor?</button>
+        <div class="faq-a">Our predictor has a 94% accuracy rate verified across three admission cycles. We update cut-off data within 48 hours of official announcements.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this, 'Who are the counsellors?')">Who are the expert counsellors?</button>
+        <div class="faq-a">All counsellors are graduates of IITs, IIMs, AIIMS, or equivalent top institutions and have personally guided 100+ successful admission cycles.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFAQ(this, 'What colleges are listed?')">How many colleges are listed?</button>
+        <div class="faq-a">We list 6,200+ UGC-approved and AICTE-approved colleges across engineering, medicine, management, arts, law, and design streams.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="margin-bottom:1rem">Edu<span>Path</span></div>
+        <p>India's most trusted college discovery and admission counselling platform, serving 8 lakh+ students since 2018.</p>
+        <br>
+        <a href="mailto:hello@edupath.in" onclick="trackContactClick('email')">hello@edupath.in</a>
+        <a href="tel:+911800123456" onclick="trackContactClick('phone')">1800-123-456 (Toll Free)</a>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#">Engineering Colleges</a>
+        <a href="#">Medical Colleges</a>
+        <a href="#">MBA Colleges</a>
+        <a href="#">Arts & Science</a>
+      </div>
+      <div>
+        <h4>Tools</h4>
+        <a href="#">Rank Predictor</a>
+        <a href="#">Scholarship Finder</a>
+        <a href="#">College Comparison</a>
+        <a href="#">Cut-off Tracker</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 EduPath Technologies Pvt. Ltd. All rights reserved.</span>
+      <span>Made for Indian Students 🇮🇳</span>
+    </div>
+  </footer>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const college = document.getElementById('preference').value || 'Not specified';
+      trackFormSubmit(college);
+      trackCTAClick('form_submit_counselling');
+      // GA4 Conversion event
+      gtag('event', 'generate_lead', {
+        currency: 'INR',
+        value: 500
+      });
+      showToast('✓ Thank you! A counsellor will contact you within 24 hours.');
+      e.target.reset();
+    }
+
+    function toggleFAQ(btn, label) {
+      const ans = btn.nextElementSibling;
+      btn.classList.toggle('open');
+      ans.classList.toggle('open');
+      trackEvent('faq_click', {
+        event_category: 'engagement',
+        event_label: label
+      });
+    }
+
+    // Intersection Observer for section view tracking
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          trackEvent('section_view', {
+            event_category: 'engagement',
+            event_label: entry.target.id || entry.target.className
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+
+    document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+  </script>
+</body>
+</html>
