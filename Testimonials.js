@@ -1,8 +1,0 @@
-const TESTIMONIALS = [
-  { name: "Ananya Sharma", college: "IIT Delhi – CSE", exam: "JEE Advanced", rank: 847, text: "CollegeCompass's Rank Predictor was spot-on! I knew exactly which branches to target and got my dream branch. The counselling team guided me through every step.", avatar: "A", score: "AIR 847" },
-  { name: "Rohan Mehta", college: "IIM Bangalore – PGP", exam: "CAT", rank: 99.4, text: "The MBA counselling sessions were a game changer. The counsellors had inside knowledge about interview processes at top IIMs that I couldn't find anywhere else.", avatar: "R", score: "99.4%ile" },
-  { name: "Priya Nair", college: "AIIMS New Delhi – MBBS", exam: "NEET", rank: 312, text: "As a student from Kerala, I had no idea how to navigate NEET counselling for all-India seats. CollegeCompass made the entire process crystal clear. Forever grateful!", avatar: "P", score: "AIR 312" },
-  { name: "Karthik Subramaniam", college: "NIT Warangal – ECE", exam: "JEE Main", rank: 4200, text: "I was confused between 5 NITs. The College Comparison Tool helped me evaluate placements, campus life and fees side by side. Best decision I ever made.", avatar: "K", score: "AIR 4200" },
-  { name: "Sneha Gupta", college: "BITS Pilani – CS", exam: "BITSAT", rank: 98, text: "The scholarship finder found ₹1.2L in scholarships I had no idea I was eligible for. The virtual tour of BITS convinced me this was my place!", avatar: "S", score: "BITSAT 371" },
-  { name: "Aditya Kumar", college: "IIT Madras – Mech", exam: "JEE Advanced", rank: 1240, text: "Moved from Bihar to Chennai for IIT Madras. CollegeCompass's hostel and campus info prepared me perfectly. The placement data was accurate to the last decimal.", avatar: "A", score: "AIR 1240" },
-];
